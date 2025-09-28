@@ -14,7 +14,7 @@ async def prevision_ipca(input_data: PredictionInput):
         if(len(input_for_model) != 8):
             raise ValueError("Deve ser informado o valor de 8 categorias para realizar predição")
         
-        predictions_array = IpcaService().make_predicstions([input_for_model])
+        predictions_array = IpcaService().make_predictions([input_for_model])
         
         if not predictions_array or not isinstance(predictions_array[0], (int, float)):
              raise ValueError("O serviço de previsão não retornou o formato esperado.")
@@ -43,6 +43,7 @@ def get_target_ipca():
     try:
         dao = IpcaDAO()
         target = dao.get_target()
+        target =target.sort_values(by=['month'],ascending=True)
         json_data = target.to_dict(orient='records')
         return json_data
     except Exception as e:
@@ -70,4 +71,16 @@ def get_errors_ipca():
     except Exception as e:
         print(f"Erro ao pegar métricas de erro: {e}")
         raise HTTPException(status_code=500, detail=f"Erro interno no servidor ao buscar informações: {e}")
+    
+@router.post('/training-model')
+def training_model():
+    try:
+        ipca_service = IpcaService()
+        ipca_service.training_model()
+        ipca_service.save_predictions()
+        ipca_service.save_error_metrics()
+        
+        return {"message": "Modelo treinado"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f'Erro ao treinar modelo: {e}')
 

@@ -61,7 +61,7 @@ class IpcaService:
         print(f"Inserindo {len(records)} novos registros do Ipca no banco de dados.")
         repository.create_multiple_ipca_records(records)
 
-    def __training_model(self):
+    def training_model(self):
         target = self.__target()
         feature = self.__feature()
         test = TrainTestSplit()
@@ -72,7 +72,7 @@ class IpcaService:
         return linear_regression
     
     def save_predictions(self):
-        df_predictions = self.__training_model().predictions()
+        df_predictions = self.training_model().predictions()
         db = SessionLocal() 
         records = []
         repository = PredictionsRepository(db)
@@ -88,7 +88,7 @@ class IpcaService:
         repository.create_multiple_ipca_records(records)
         
     def save_error_metrics(self):
-        records_errors = self.__training_model().errors()
+        records_errors = self.training_model().errors()
         db = SessionLocal() 
         repository = ErrorMetricsRepository(db)
         
@@ -96,5 +96,5 @@ class IpcaService:
         
         repository.create_multiple_error_metrics([records_errors])
         
-    def make_predicstions(self, feature_predictions: list[list[float]]):
-        return self.__training_model().make_prediction(feature_predictions)
+    def make_predictions(self, feature_predictions: list[list[float]]):
+        return self.training_model().make_prediction(feature_predictions)

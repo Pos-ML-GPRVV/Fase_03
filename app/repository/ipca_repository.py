@@ -101,6 +101,7 @@ class IpcaRepository:
                 where 1=1
                 and i.type = 'IPCA - Variação mensal'
                 and i.category = 'Índice geral'
+                order by i.month asc
             """,
             con=self.db.bind
         )
@@ -145,6 +146,7 @@ class IpcaRepository:
                 where 1=1
                 and i.category <> 'Índice geral' 
                 and i.type <> 'IPCA - Peso mensal'
+                order by i.month, i.category asc
             """,
             con=self.db.bind
         )
