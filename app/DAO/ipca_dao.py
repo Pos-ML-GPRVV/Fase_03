@@ -1,28 +1,38 @@
-import sidrapy
-from app.enums.tables_ipca import tables
-import pandas as pd
-
+from app.repository.ipca_repository import IpcaRepository
+from app.database import SessionLocal
+import numpy as np
 
 class IpcaDAO:
-    def __init__(self) -> None:
+    def __init__(self):
         pass
+    
+    def get_features(self):
+        db = SessionLocal()
+        repository = IpcaRepository(db)
+        features = repository.get_features()
+        return features
+    
+    def get_target(self):
+        db = SessionLocal()
+        repository = IpcaRepository(db)
+        target = repository.get_target()
+        return target
+    
+    def get_general_index(self):
+        db = SessionLocal()
+        repoistory = IpcaRepository(db)
+        general_index = repoistory.get_general_index()
+        general_index['prediction_value'] = general_index['prediction_value'].replace({np.nan: None})
+        return general_index
 
-    def get(self):
-        results = []
-        # categories_str = ",".join(map(str, categories))
-        for table_code, table_data in tables.items():
-            get_ipca = sidrapy.get_table(
-                table_code=table_code,
-                territorial_level="1",
-                ibge_territorial_code="all",
-                variable=table_data["variable"],
-                period="all",
-                # categories=f"7169,{categories_str}",
-                categories=f"7169,7170,7222,7445,7486,7558,7625,7660,7712,7766",
-                classification=table_data["classification"],
-                header="n",
-            )
-            results.append(pd.DataFrame(get_ipca))
-            ipca = pd.concat(results, ignore_index=True)
-            
-        return ipca
+    def get_errors(self):
+        db = SessionLocal()
+        repository = IpcaRepository(db)
+        errors = repository.get_errors()
+        return errors
+    
+    def get_features_with_weight(self):
+        db = SessionLocal()
+        repository = IpcaRepository(db)
+        features_with_weight = repository.get_features_with_weight()
+        return features_with_weight

@@ -11,6 +11,8 @@ class TrainTestSplit:
     def train_test_split(self, x: pd.DataFrame, y: pd.DataFrame, test_size: float):
         x_values = self.min_max_scaler.fit_transform(x)
         y_values = y.values
+        quantity_trained = int(len(x) * test_size)
+        months_trained = x[(len(x) - quantity_trained):len(x)].index
 
         x_training, x_testing, y_training, y_testing = train_test_split(
             x_values, y_values, test_size=test_size, shuffle=False, random_state=23
@@ -21,4 +23,5 @@ class TrainTestSplit:
             "x_testing": x_testing,
             "y_training": y_training,
             "y_testing": y_testing,
+            "months_trained": months_trained
         }

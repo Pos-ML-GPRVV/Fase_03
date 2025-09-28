@@ -17,4 +17,4 @@ class Ipca(Base):
     )
 
     def __repr__(self) -> str:
-        return f"Ipca(id={self.id!r}, category='{self.category}', month='{self.month}/{self.year}')"
+        return f"Ipca(id={self.id!r}, category='{self.category}', month='{self.month}')"

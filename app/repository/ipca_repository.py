@@ -1,8 +1,9 @@
 from typing import Dict, Any, List
 from sqlalchemy.orm import Session
-from app.model.ipca import Ipca # Presumindo que o modelo está aqui
-from sqlalchemy import exc
+from app.model.ipca import Ipca
+from sqlalchemy import exc, text
 from sqlalchemy.dialects.postgresql import insert
+import pandas as pd
 
 class IpcaRepository:
     def __init__(self, db: Session):
@@ -39,5 +40,114 @@ class IpcaRepository:
             self.db.rollback()
             print(f"Erro ao realizar upsert em massa de registros IPCA: {e}")
             
-    def get(self): 
-        pass #TODO criar o get
+    def get_features(self): 
+        df_feature = pd.read_sql_query(
+            sql=text("""
+                     select 
+                        i.month,
+                        i.category,
+                        i.type,
+                        (i.value * w.value) as "value"
+                        from ipca as i 
+                        left join (
+                            select 
+                                i.month,
+                                i.category,
+                                i.type,
+                                i.value
+                                from ipca as i 
+                                where 1=1
+                                and i.category <> 'Índice geral' 
+                                and i.type = 'IPCA - Peso mensal'
+                        ) as w on w.month = i.month and w.category = i.category
+                        where 1=1
+                        and i.category <> 'Índice geral' 
+                        and i.type <> 'IPCA - Peso mensal'
+                     """), 
+            con=self.db.bind 
+        )
+
+        return df_feature
+    
+    def get_target(self):
+        df_target = pd.read_sql_query(
+            sql="""
+            select 
+                i.month,
+                i.category,
+                i.type,
+                i.value
+                from ipca as i 
+                where 1=1
+                and i.category = 'Índice geral' 
+                and i.type <> 'IPCA - Peso mensal'
+            """,
+            con=self.db.bind
+        )
+        
+        return df_target
+    
+    
+    def get_general_index(self):
+        df_general_index = pd.read_sql_query(
+            sql="""
+            select 
+                i.month,
+                i.type,
+                i.value as "real_value",
+                p.value as "prediction_value"
+                from ipca as i
+                left join predictions as p on p.month = i.month
+                where 1=1
+                and i.type = 'IPCA - Variação mensal'
+                and i.category = 'Índice geral'
+            """,
+            con=self.db.bind
+        )
+        
+        return df_general_index
+    
+    def get_errors(self):
+        df_errors = pd.read_sql_query(
+            sql="""
+            select 
+                em.mse,
+                em.rmse,
+                em.mape
+            from error_metrics as em
+            """,
+            con=self.db.bind
+        )
+        
+        return df_errors
+    
+    def get_features_with_weight(self):
+        df_features_with_weight = pd.read_sql_query(
+            sql="""
+            select 
+                i.month,
+                i.category,
+                i.type,
+                i.value,
+                w.value as "weight"
+                from ipca as i 
+                left join (
+                    select 
+                        i.month,
+                        i.category,
+                        i.type,
+                        i.value
+                        from ipca as i 
+                        where 1=1
+                        and i.category <> 'Índice geral' 
+                        and i.type = 'IPCA - Peso mensal'
+                ) as w on w.month = i.month and w.category = i.category
+                where 1=1
+                and i.category <> 'Índice geral' 
+                and i.type <> 'IPCA - Peso mensal'
+            """,
+            con=self.db.bind
+        )
+        
+        return df_features_with_weight
+    
