@@ -1,2 +1,6 @@
+# ambientes/artefatos locais
 .env
-__pycache__
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
