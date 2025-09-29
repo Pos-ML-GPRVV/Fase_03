@@ -24,5 +24,5 @@ if __name__ == "__main__":
     ipca_service.save_predictions()
     ipca_service.save_error_metrics()
     
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
     
