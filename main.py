@@ -24,14 +24,6 @@ def create_database_tables():
     Base.metadata.create_all(engine)
     print("[POSTGRESQL]: Tables created.")
 
-@app.on_event("startup")
-def on_startup():
-    create_database_tables()
-    svc = IpcaService()
-    svc.save_ipca_data_in_database()
-    svc.save_predictions()
-    svc.save_error_metrics()
-
 # 🔐 aplica API Key em TODAS as rotas do controller (faz o cadeado aparecer no /docs)
 app.include_router(ipca_router, dependencies=[Security(require_api_key)])
 
