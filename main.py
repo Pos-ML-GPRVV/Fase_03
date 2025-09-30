@@ -7,10 +7,12 @@ from fastapi.responses import RedirectResponse
 from app.database import Base, engine
 from app.controller.ipca_controller import router as ipca_router
 from app.auth.api_key import require_api_key
+from app.services.ipca_service import IpcaService
+ipca_service = IpcaService()
 
 # IMPORTANTE: importar os modelos para registrar as tabelas na Base
 # (o “import” já registra na metadados do SQLAlchemy)
-import app.model.ipca          # tabela ipca
+from app.model.ipca import Ipca      # tabela ipca
 import app.model.predictions   # tabela predictions
 import app.model.error_metrics # tabela error_metrics
 
@@ -25,12 +27,10 @@ def create_database_tables():
 @app.on_event("startup")
 def on_startup():
     create_database_tables()
-    # Se quiser automatizar ETL/treino no startup, descomente:
-    # from app.services.ipca_service import IpcaService
-    # svc = IpcaService()
-    # svc.save_ipca_data_in_database()
-    # svc.save_predictions()
-    # svc.save_error_metrics()
+    svc = IpcaService()
+    svc.save_ipca_data_in_database()
+    svc.save_predictions()
+    svc.save_error_metrics()
 
 # 🔐 aplica API Key em TODAS as rotas do controller (faz o cadeado aparecer no /docs)
 app.include_router(ipca_router, dependencies=[Security(require_api_key)])
