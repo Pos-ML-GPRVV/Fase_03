@@ -232,15 +232,6 @@ O sistema gera logs para:
 - Geração de predições
 - Erros e exceções
 
-## 🔧 Desenvolvimento
-
-### Estrutura de Commits
-- `feat:` Nova funcionalidade
-- `fix:` Correção de bug
-- `docs:` Documentação
-- `refactor:` Refatoração de código
-- `test:` Testes
-
 ### Contribuição
 1. Fork o projeto
 2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
@@ -254,10 +245,7 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ## 👥 Autores
 
-- [Seu Nome] - Desenvolvimento inicial
-
-## 🙏 Agradecimentos
-
-- IBGE/SIDRA pela disponibilização dos dados do IPCA
-- Comunidade Python e FastAPI
-- Scikit-learn pela biblioteca de machine learning
+- ⁠Gustavo Silva Imbelloni Borde RM364281
+- ⁠Patrick Gabriel Meirelles RM361488 
+- Raíssa Campos dos Santos RM364024
+- Vitor Crispim Romera Rodrigues RM361332
