@@ -13,20 +13,23 @@ import pandas as pd
 class SklearnLienarRegression:
     def __init__(self, train_test_split):
         self._train_test_split = train_test_split
+        self._model = None
 
     def model_trained(self):
+        if self._model is not None:
+            return self._model
+            
         lr = LinearRegression()
-        model = lr.fit(
+        self._model = lr.fit(
             self._train_test_split.data["x_training"],
             self._train_test_split.data["y_training"],
         )
-        return model
+        return self._model
 
     def predictions(self) -> pd.DataFrame:
         x_test = self._train_test_split.data["x_testing"]
         months_trained = self._train_test_split.data["months_trained"]
         y_pred = self.model_trained().predict(x_test)
-        # garante tipos nativos p/ JSON
         df_pred = pd.DataFrame(
             {"month": months_trained, "prediction": y_pred},
             index=months_trained,

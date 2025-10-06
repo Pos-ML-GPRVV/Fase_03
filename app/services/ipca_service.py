@@ -6,12 +6,15 @@ from app.database import SessionLocal
 from app.DAO.ipca_dao import IpcaDAO
 from app.repository.predictions_repository import PredictionsRepository
 from app.repository.error_metrics_repository import ErrorMetricsRepository
+import pandas as pd
+import uuid
 
 
 class IpcaService:
     def __init__(self):
         self.sidrapy_dao = SidrapyDAO()
         self.ipca_dao = IpcaDAO()
+        self._trained_model = None
         pass
 
     def __target(self):
@@ -62,14 +65,29 @@ class IpcaService:
         repository.create_multiple_ipca_records(records)
 
     def training_model(self):
+        if self._trained_model is not None:
+            print("🔄 Usando modelo em cache (não retreinando)")
+            return self._trained_model
+            
+        training_id = str(uuid.uuid4())[:8]
+        print(f"🚀 Treinando novo modelo [ID: {training_id}]...")
+        print(f"📅 Timestamp: {pd.Timestamp.now()}")
         target = self.__target()
         feature = self.__feature()
+        print(f"📊 Dados: {len(feature)} features, {len(target)} targets")
         test = TrainTestSplit()
         test.train_test_split(feature, target, test_size=0.3) 
         linear_regression = SklearnLienarRegression(test)
         linear_regression.model_trained()
         
+        self._trained_model = linear_regression
+        print(f"✅ Modelo treinado e salvo no cache [ID: {training_id}]")
         return linear_regression
+    
+    def retrain_model(self):
+        print("🔄 Forçando retreinamento do modelo...")
+        self._trained_model = None
+        return self.training_model()
     
     def save_predictions(self):
         df_predictions = self.training_model().predictions()

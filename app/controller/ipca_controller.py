@@ -81,11 +81,11 @@ def get_errors_ipca():
 def training_model():
     try:
         ipca_service = IpcaService()
-        ipca_service.training_model()
+        ipca_service.retrain_model()
         ipca_service.save_predictions()
         ipca_service.save_error_metrics()
         
-        return {"message": "Modelo treinado"}
+        return {"message": "Modelo retreinado com sucesso"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'Erro ao treinar modelo: {e}')
 
